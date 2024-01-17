@@ -1,3 +1,9 @@
+# App screenshots:
+![Predictions table](https://github.com/EMitkus/KTU-DVDA-PROJECT/assets/154337829/5f8cb5b9-6135-434b-9baf-eef1ee85f381)
+![Chart](https://github.com/EMitkus/KTU-DVDA-PROJECT/assets/154337829/84e6ff0d-835c-429b-8d71-39524f6c7760)
+![Predictions table](https://github.com/EMitkus/KTU-DVDA-PROJECT/assets/154337829/f9826376-5637-4c47-83fe-51155c6f3a1c)
+![Help](https://github.com/EMitkus/KTU-DVDA-PROJECT/assets/154337829/30ff2fba-3624-4af1-ac04-9be6d1fc16ae)
+
 # Project Title
 
 Bank Loan Approval Predictor
