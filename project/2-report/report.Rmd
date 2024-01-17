@@ -1,34 +1,126 @@
 ---
-title: "test"
-author: "test"
-date: "10/3/2021"
+title: "Banko Paskolų Duomenų Eksploratyvinė Analizė"
+author: "EM"
+date: "16/01/2024"
 output:
   html_document:
     keep_md: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+## Įvadas
+
+Ši ataskaita skirta eksploratyvinei banko paskolų duomenų analizei. Mes įvertinsime pagrindines duomenų tendencijas, atliksime kintamųjų apžvalgą ir vizualizuosime svarbiausius duomenų aspektus.
+
+## Duomenų Paruošimas ir Įkėlimas
+
+Reikalingų bibliotekų įkėlimas:
+
+```{r message=FALSE, warning=FALSE}
+
+library(tidyverse)
+library(knitr)
+library(tibble)
+library(ggplot2)
+library(scales)
+library(DT)
+library(dplyr)
+library(plotly)
 ```
 
-TEST
+Duomenų įkėlimas (naudojamas cache=TRUE efektyvumui užtikrinti):
 
-## R Markdown
+```{r message=FALSE, warning=FALSE, cache=TRUE}
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+df <- read.csv("../../project/1-data/1-sample_data.csv")
 ```
 
-## Including Plots
+## Duomenų Rinkinio Apžvalga
 
-You can also embed plots, for example:
+Duomenų failo dimensijos:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r  echo=FALSE}
+
+dim(df)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Duomenų failas turi **1000000 eilučių** ir **9 stulpelius**, toliau apžvelgiame kintamuosius:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+summary(df) %>%
+  kable()
+```
+
+Minėti 9 stulpeliai:
+
+-   **`id`**: naudojamas kaip atitinkamos eilutės identifikatorius.
+-   **`y`**: dvejetainis kintamasis, naudojamas nurodyti, ar suteikti paskolą (1), ar ne (0).
+-   **`amount_current_loan`**: dabartinės paskolos dydis.
+-   **`term`**: paskolos išsimokėjimo terminas.
+-   **`credit_score`**: kreditingumo reitingas.
+-   **`loan_purpose`**: kokiam tikslui bandoma gauti paskolą.
+-   **`yearly_income`**: paskolos gavėjo metinio uždarbio dydis.
+-   **`home_ownership`**: paskolos gavėjo būsto tipas (savininkas, nuomininkas, t.t.).
+-   **`bankruptcies`**: paskolos gavėjo bankrotų skaičius.
+
+Matome, jog **y** reikšmės yra rodiklis, ar paskola bus patvirtinta, todėl modeliavime tai bus mūsų pagrindinis kategorinis kintamasis.
+
+# Išsami Duomenų Analizė
+
+Kintamųjų tipų keitimas ir **N/A** reikšmių analizė:
+
+-   Pakeičiame kintamuosius **y** ir **loan_purpose** į faktoriaus tipo kintamuosius;
+-   Apžvelgiame pagrindinius paskolos tikslus;
+-   Nustatome, kiek **N/A** reikšmių yra dokumente bei stulpeliuose;
+
+Pagrindinių paskolos tikslų apžvalga:
+
+```{r echo=FALSE}
+
+df$loan_purpose <- as.factor(df$loan_purpose)
+df$y <- as.factor(df$y)
+```
+
+```{r echo=FALSE}
+
+df %>%
+  group_by(loan_purpose) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) %>%
+  datatable()
+```
+
+Didžioji dalis paskolą bando gauti siekiant **padengti jau turimą paskolą** (arti 80%), kiti tikslai po didžiajai daliai buitiniai (**namų remontas, mašinos pirkimas, kt.**) bei laisvalaikio (**išvykos, poilsis, t.t.**).
+
+**N/A** reikšmių apžvalga:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+missing_values <- colSums(is.na(df))
+missing_values_df <- data.frame("Na_skaicius" = missing_values)
+missing_values_df <- rownames_to_column(missing_values_df, var = "Stulpelis")
+
+missing_values_df %>%
+  arrange(desc(Na_skaicius)) %>%
+  datatable()
+```
+
+**N/A** reikšmes turi tik trys kintamieji- **credit_score**, **yearly_income** ir **bankruptcies**. Pagal **N/A** reikšmių kiekius kintamuosiuose sprendžiame, jog kintamieji **credit_score** (apie 30% reikšmių- **N/A**) bei **yearly_income** (apie 20% reikšmių - **N/A**) nebus tokie reikšmingi paskolos suteikimo procese, kaip kad kiti kintamieji.
+
+Atvaizduojame paskolos suteikimo duomenis pagal paskolos tikslą:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+df %>%
+  group_by(y, loan_purpose) %>%
+  summarise(n = n(), .groups = 'drop') %>%
+  plot_ly(x = ~loan_purpose, y = ~n, 
+          color = ~as.factor(y), 
+          colors = c('red', 'blue'),
+          type = "bar") %>%
+  layout(xaxis = list(title = 'Paskolos tikslas'), 
+         yaxis = list(title = 'Paskolų kiekis'),
+         barmode = 'stack',
+         legend = list(title = list(text = 'Paskolos statusas'),
+                       labels = c('Atmesta', 'Patvirtinta')))
+```
