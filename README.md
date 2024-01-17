@@ -1,70 +1,65 @@
-# Užduotis
+# Project Title
 
-Sukurkite duomenų produktą - analitinę aplikaciją, skirtą banko paskolos įvertinimui mašininio mokymosi algoritmų pagalba.
+Bank Loan Approval Predictor
 
-<img src="practice/img/data_product.png" width="500"/>
+# Motivation
+
+This project aims to assist banks in making loan approval decisions based on customer information.
+
+# Dependencies
+
+To run this project, you'll need the following dependencies:
+
+-   R kernel
+-   R packages:
+
+```         
+
+    install.packages("h2o")
+    install.packages("shiny")
+    install.packages("shinybusy")
+    install.packages("tidyverse")
+    install.packages("knitr")
+    install.packages("tibble")
+    install.packages("ggplot2")
+    install.packages("scales")
+    install.packages("DT")
+    install.packages("dplyr")
+    install.packages("plotly")
+
+```
+
+# Directory structure
+
+The project directory is structured as follows:
+```         
+    ├───1-data
+    ├───2-report
+    ├───3-R
+    ├───4-model
+    ├───5-predictions
+    └───app
+```
 
 
-#### Projekte ugdomi gebėjimai
+## How to Execute Code
 
--   analizuoti ir interpretuoti skaičiavimų rezultatus, įvertinti ar galima taikyti duomenų tyrybos metodą konkretiems duomenims ir jeigu ne, pasiūlyti kitą tinkamą metodą;\
--   apibendrinti gautus rezultatus ir pateikti pagrįstas išvadas ir prognozes, rengti ataskaitas;\
--   atlikti duomenų tyrybą panaudojant duomenų tyrybos programinę įrangą;
--   paaiškinti naudotų duomenų tyrybos metodų sąvokas ir teoriją ;
--   sudaryti duomenų tyrybos modelius realiems didiesiems verslo duomenims tirti.
+To run the code, follow these steps:
 
-#### Projekto vertinimo kriterijai
+```         
+        1. Clone the GitHub repository:
+          git clone https://github.com/kestutisd/KTU-DVDA-PROJECT.git
+        2. Download data from:
+          https://drive.google.com/drive/folders/17NsP84MecXHyctM94NLwps_tsowld_y8
+        3. Navigate to the directory with data preparation scripts:
+          cd KTU-DVDA-PROJECT/project/3-R
+        4. Execute the data preparation script to transform the data:
+          RScript data_transformation.R
+```
+## Data Analysis
 
-1.  Mokslinės literatūros tinkamumas projekto temai.\
-2.  Domenų tyrybos metodų parinkimas projekto uždavinių sprendimui.
-3.  Sukurtų duomenų tyrybos modelių tikslumas ir kokybė
-4.  Modelių programų kokybė.
-5.  Gautų rezultatų patikimumas, interpretavimo teisingumas, išvadų pagrįstumas.
-6.  Rekomendacijos sukurtų modelių tobulinimui.
-7.  Projekto ataskaitos atitikimas nustatytiems reikalavimams.
+A quick analysis of the sample data can be found in KTU-DVDA-PROJECT/project/2-report/report.md
 
-#### Reikalingi įrankiai projektui
+## Results
 
--   R (shiny, tidyverse, rmarkdown)
--   git, github
--   h2o mašininio mokymosi platforma <https://www.h2o.ai/>
--   projekto ataskaita rengiama markdown formatu (arba <https://rmarkdown.rstudio.com/>)
-
-------------------------------------------------------------------------
-
-# Vertinimo schema *(10 balų skalė)*
-
-1.  GitHub projektas (1 t.)
-2.  Duomenų nuskaitymas ir apjungimas (1 t.)
-3.  Duomenų žvalgomoji analizė (1 t.)
-4.  Modelio parinkimas (1 t.)
-5.  Hyperparametrų optimizavimas (1 t.)
-6.  WEB aplikacijos sukūrimas paskolos spėjimui (2 t.)
-7.  Modelio tikslumas naujiems duomenims (2 t.)
-
-Sum = 9
-
-#### Papildomi taškai
-
-1.  Shiny aplikacijos dizainas (1 t.)
-2.  Shiny aplikacijos funkcionalumas (1 t.)
-3.  Papildomų ML paketu taikymas (SparkML, SciKit-Learn, Keras, Tensorflow) (1 t.)
-4.  Shiny aplikacijos pateikimas (Docker, Shiny-Apps, Shiny-Server) (1 t.)
-
-sum = 4
-
-**Top 3 komandos/dalyviai gaus maksimalų įvertinimą**
-
-<img src="practice/img/vertinimas.png" width="500"/>
-
-# Duomenys
-
-Paskolų įsipareigojimo nevykdymas (loan default)
-
--   id - unikalus ID
--   y - ar įvykdytas paskolos įsipareigojimas (0 - TAIP, 1 - NE)
--   kiti kintamieji - paskolos parametrai (pvz. kredito istorija, paskolos tipas)
-
-Duomenis galite atsisiųsti iš:
-
-[Google Drive](https://drive.google.com/drive/folders/17NsP84MecXHyctM94NLwps_tsowld_y8?usp=sharing)
+Our analysis found that the Stacked Ensamble model achieved the best performance with an AUC of 0.83 on the training dataset.
