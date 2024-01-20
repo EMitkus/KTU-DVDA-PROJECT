@@ -48,7 +48,7 @@ To run the code, follow these steps:
 
 ```         
         1. Clone the GitHub repository:
-          git clone https://github.com/kestutisd/KTU-DVDA-PROJECT.git
+          git clone https://github.com/EMitkus/KTU-DVDA-PROJECT.git
         2. Download data from:
           https://drive.google.com/drive/folders/17NsP84MecXHyctM94NLwps_tsowld_y8
         3. Navigate to the directory with data preparation scripts:

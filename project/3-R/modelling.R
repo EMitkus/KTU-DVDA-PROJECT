@@ -35,10 +35,10 @@ aml <- h2o.automl(x = x,
 
 aml@leaderboard
 
+
+#Used interchangibly to load the best model (in this case the Stacked Ensamble model)
 model <- aml@leader
-
-
-model <- h2o.getModel("StackedEnsemble_BestOfFamily_1_AutoML_2_20240116_231755")
+#model <- h2o.getModel("StackedEnsemble_BestOfFamily_1_AutoML_2_20240116_231755")
 
 h2o.performance(model, train = TRUE)
 h2o.performance(model, valid = TRUE)
@@ -49,7 +49,8 @@ plot(perf, type = "roc")
 
 #h2o.performance(model, newdata = test_data)
 
-predictions <- h2o.predict(model, test)
+test_without_y <- h2o.importFile("../../project/1-data/test_data_without_y.csv")
+predictions <- h2o.predict(model, test_without_y)
 predictions
 
 predictions %>%
@@ -62,7 +63,8 @@ predictions %>%
 
 h2o.saveModel(model, "../4-model/", filename = "my_best_automlmodel")
 
-model <- h2o.loadModel("../4-model/my_best_automlmodel")
+#Used to load the model from saved environment
+#model <- h2o.loadModel("../4-model/my_best_automlmodel")
 h2o.varimp_plot(model)
 
 # Grid search

@@ -1,122 +1,118 @@
 ---
-title: "Exploratory Analysis"
-author: "KD"
-date: "27/10/2023"
+title: "Banko Paskolų Duomenų Eksploratyvinė Analizė"
+author: "EM"
+date: "16/01/2024"
 output:
   html_document:
     keep_md: true
 ---
 
-Užkrauname reikalingas bibliotekas
+## Įvadas
 
+Ši ataskaita skirta eksploratyvinei banko paskolų duomenų analizei. Mes įvertinsime pagrindines duomenų tendencijas, atliksime kintamųjų apžvalgą ir vizualizuosime svarbiausius duomenų aspektus.
+
+## Duomenų Paruošimas ir Įkėlimas
+
+Reikalingų bibliotekų įkėlimas:
 ```{r message=FALSE, warning=FALSE}
+
 library(tidyverse)
 library(knitr)
+library(tibble)
+library(ggplot2)
+library(scales)
+library(DT)
+library(dplyr)
+library(plotly)
 ```
 
-Generuojant ataskaitą galima failo neskaityti kiekvieną kartą iš naujo - cache=TRUE. Nenorint klaidų/informacinių pranešimų pridedame message=FALSE ir warning=FALSE.
-
+Duomenų įkėlimas (naudojamas cache=TRUE efektyvumui užtikrinti):
 ```{r message=FALSE, warning=FALSE, cache=TRUE}
-df <- read_csv("../../../project/1-data/1-sample_data.csv")
+
+df <- read.csv("../../../project/1-data/1-sample_data.csv")
 ```
+
+## Duomenų Rinkinio Apžvalga
 
 Duomenų failo dimensijos:
+```{r  echo=FALSE}
 
-
-```{r}
 dim(df)
 ```
-# Kintamųjų apžvalga
-
-
-(dėl gražesnio spaudinimo, naudojame funkciją kable() ir išdaliname kintamuosius į kelias eilutes)
-
-
-```{r}
-summary(df)
-```
-
-Galutinėje ataskaitoje galime neįtraukti R kodo, naudojant echo=FALSE parametrą. 
-
+Duomenų failas turi __1000000 eilučių__ ir __9 stulpelius__, toliau apžvelgiame kintamuosius:
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+
 summary(df) %>%
   kable()
 ```
+Minėti 9 stulpeliai:
+
+- __`id`__: naudojamas kaip atitinkamos eilutės identifikatorius.
+- __`y`__: dvejetainis kintamasis, naudojamas nurodyti, ar suteikti paskolą (1), ar ne (0).
+- __`amount_current_loan`__: dabartinės paskolos dydis.
+- __`term`__: paskolos išsimokėjimo terminas.
+- __`credit_score`__: kreditingumo reitingas.
+- __`loan_purpose`__: kokiam tikslui bandoma gauti paskolą.
+- __`yearly_income`__: paskolos gavėjo metinio uždarbio dydis.
+- __`home_ownership`__: paskolos gavėjo būsto tipas (savininkas, nuomininkas, t.t.).
+- __`bankruptcies`__: paskolos gavėjo bankrotų skaičius.
+
+Matome, jog __y__ reikšmės yra rodiklis, ar paskola bus patvirtinta, todėl modeliavime tai bus mūsų pagrindinis kategorinis kintamasis.
 
 
-# TO DO
+# Išsami Duomenų Analizė
 
-Apžvelgti NA reikšmes, y pasiskirstymą, character tipo kintamuosius panagrinėti detaliau.
+Kintamųjų tipų keitimas ir __N/A__ reikšmių analizė:
 
+- Pakeičiame kintamuosius __y__ ir __loan_purpose__ į faktoriaus tipo kintamuosius;
+- Apžvelgiame pagrindinius paskolos tikslus;
+- Nustatome, kiek __N/A__ reikšmių yra dokumente bei stulpeliuose;
 
-```{r}
+Pagrindinių paskolos tikslų apžvalga:
+```{r echo=FALSE}
+
 df$loan_purpose <- as.factor(df$loan_purpose)
 df$y <- as.factor(df$y)
 ```
 
+```{r echo=FALSE}
 
-```{r}
-summary(df$loan_purpose) %>%
-  kable()
-```
-
-
-Arba:
-
-```{r}
 df %>%
   group_by(loan_purpose) %>%
   summarise(n = n()) %>%
   arrange(desc(n)) %>%
-  kable()
-```
-
-Pasirinkus kintamuosius juos vizualizuokite
-
-```{r message=FALSE, warning=FALSE}
-df %>%
-  group_by(y, loan_purpose) %>%
-  summarise(n = n()) %>%
-  ggplot(aes(fill=y, y=n, x=loan_purpose)) + 
-  geom_bar(position="dodge", stat="identity") + 
-  coord_flip() +
-  scale_y_continuous(labels = scales::comma) +
-  theme_dark()
-```
-
-Daugiausiai banktotų imant paskolą šiems tikslams:
-
-```{r message=FALSE, warning=FALSE}
-df %>%
-  filter(y == 1) %>%
-  group_by(loan_purpose) %>%
-  summarise(n = n()) %>%
-  arrange(desc(n)) %>%
-  head(10) %>%
-  kable()
-```
-
-
-# Papildomi pasiūlymai interaktyvumui pagerinti
-
-Interaktyvios lentelės su datatable (DT)
-
-```{r message=FALSE, warning=FALSE}
-library(DT)
-df %>%
-  group_by(y, loan_purpose) %>%
-  summarise(n = n()) %>%
   datatable()
 ```
+Didžioji dalis paskolą bando gauti siekiant __padengti jau turimą paskolą__ (arti 80%), kiti tikslai po didžiajai daliai buitiniai (__namų remontas, mašinos pirkimas, kt.__) bei laisvalaikio (__išvykos, poilsis, t.t.__).
 
-Interaktyvūs grafikai su plotly
+  
+__N/A__ reikšmių apžvalga:
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-```{r message=FALSE, warning=FALSE}
-library(plotly)
-df %>%
-  group_by(y, credit_score) %>%
-  summarise(n = n()) %>%
-  plot_ly(x = ~credit_score, y = ~n, name = ~y, type = "bar")
+missing_values <- colSums(is.na(df))
+missing_values_df <- data.frame("Na_skaicius" = missing_values)
+missing_values_df <- rownames_to_column(missing_values_df, var = "Stulpelis")
+
+missing_values_df %>%
+  arrange(desc(Na_skaicius)) %>%
+  datatable()
 ```
+__N/A__ reikšmes turi tik trys kintamieji- __credit_score__, __yearly_income__ ir __bankruptcies__. Pagal __N/A__ reikšmių kiekius kintamuosiuose sprendžiame, jog kintamieji __credit_score__ (apie 30% reikšmių- __N/A__) bei __yearly_income__ (apie 20% reikšmių - __N/A__) nebus tokie reikšmingi paskolos suteikimo procese, kaip kad kiti kintamieji.
 
+Atvaizduojame paskolos suteikimo duomenis pagal paskolos tikslą:
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+df %>%
+  group_by(y, loan_purpose) %>%
+  summarise(n = n(), .groups = 'drop') %>%
+  plot_ly(x = ~loan_purpose, y = ~n, 
+          color = ~as.factor(y), 
+          colors = c('red', 'blue'),
+          type = "bar") %>%
+  layout(xaxis = list(title = 'Paskolos tikslas'), 
+         yaxis = list(title = 'Paskolų kiekis'),
+         barmode = 'stack',
+         legend = list(title = list(text = 'Paskolos statusas'),
+                       labels = c('Atmesta', 'Patvirtinta')))
+```
 

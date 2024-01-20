@@ -68,4 +68,7 @@ A quick analysis of the sample data can be found in KTU-DVDA-PROJECT/project/2-r
 
 ## Results
 
-Our analysis found that the Stacked Ensamble model achieved the best performance with an AUC of 0.83 on the training dataset.
+Our analysis found that the Stacked Ensamble model achieved the best performance with an AUC of 0.83 on the training dataset. The Stacked Ensemble in our case was composed of two base models (1/2):
+- 1 base model was a GBM (Gradient Boosting Machine).
+- 1 base model was a GLM (Generalized Linear Model).
+These base models were combined using a stacking strategy, and a GLM was used as the metalearner to create the final Stacked Ensemble model.

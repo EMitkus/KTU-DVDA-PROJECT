@@ -1,9 +1,11 @@
 library(h2o)
 library(tidyverse)
-h2o.init(max_mem_size = "8g")
+h2o.init()
+
+h2o.clusterStatus()
+
 
 df <- h2o.importFile("../../../project/1-data/train_data.csv")
-test_data <- h2o.importFile("../../../project/1-data/test_data.csv")
 df
 class(df)
 summary(df)
@@ -22,14 +24,14 @@ aml <- h2o.automl(x = x,
                   y = y,
                   training_frame = train,
                   validation_frame = valid,
-                  max_runtime_secs = 60)
+                  max_runtime_secs = 120)
 
 aml@leaderboard
 
 model <- aml@leader
 
 
-model <- h2o.getModel("XGBoost_1_AutoML_3_20231117_175636")
+model <- h2o.getModel("StackedEnsemble_BestOfFamily_4_AutoML_1_20240116_203235")
 
 h2o.performance(model, train = TRUE)
 h2o.performance(model, valid = TRUE)
